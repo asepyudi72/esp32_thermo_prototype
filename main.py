@@ -8,11 +8,8 @@ import time
 SSID = "NAZLA_plus"
 PASSWORD = "BH5H5G8TGGN"
 # Ganti dengan URL server lokal atau link mentah (Raw) dari GitHub Anda
-#https://github.com/asepyudi72/
-#https://github.com/asepyudi72/esp32_thermo_prototype
-#20.205.243.166
-URL_VERSI = "http://192.168.1"
-URL_MAIN = "http://192.168.1"
+URL_VERSI = "https://raw.githubusercontent.com/asepyudi72/esp32_thermo_prototype/refs/heads/main/version.txt"
+URL_MAIN = "https://raw.githubusercontent.com/asepyudi72/esp32_thermo_prototype/refs/heads/main/main.py"
 
 VERSI_SEKARANG = "1.0.0" # Versi yang terinstal di ESP32 saat ini
 
