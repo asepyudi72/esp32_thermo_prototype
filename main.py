@@ -117,8 +117,13 @@ if hubungkan_wifi():
 
 # --- PROGRAM UTAMA ANDA DI SINI ---
 print("Menjalankan aplikasi utama...")
-led = machine.Pin(2, machine.Pin.OUT)
+led1 = machine.Pin(4, machine.Pin.OUT)
+led2 = machine.Pin(16, machine.Pin.OUT)
+led3 = machine.Pin(17, machine.Pin.OUT)
 while True:
-    led.value(not led.value())
+    led1.value(not led1.value())
     time.sleep(1)
-
+    led2.value(not led2.value())
+    time.sleep(1)
+    led3.value(not led3.value())
+    time.sleep(1)
