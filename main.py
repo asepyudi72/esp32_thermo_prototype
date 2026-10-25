@@ -1,132 +1,14 @@
-import network
-import urequests
-import os
-import machine
-import time
+import gc
+import lib.ota_updater as ota
+import lib.traffic as traffic
 
-# ==========================================
-# PENGATURAN UTAMA
-# ==========================================
-# Salin URL RAW dari GitHub Anda (Wajib diakhiri tanda / )
-URL_BASE = "https://raw.githubusercontent.com/asepyudi72/esp32_thermo_prototype/refs/heads/main/"
+# 1. Jalankan pengecekan OTA dari library ota_updater
+if ota.hubungkan_wifi():
+    ota.periksa_dan_update()
 
-# Daftar file yang di-download dari GitHub (wifi_config.txt TIDAK dimasukkan di sini!)
-DAFTAR_FILE = [
-    "main.py",
-    "version.txt"
-]
-
-def ambil_kredensial_wifi():
-    # Membaca SSID dan Password dari file lokal wifi_config.txt
-    try:
-        with open("wifi_config.txt", "r") as f:
-            baris = f.readlines()
-            ssid = baris[0].strip()
-            password = baris[1].strip()
-            return ssid, password
-    except Exception as e:
-        print("Gagal membaca wifi_config.txt! Pastikan file sudah dibuat di ESP32.")
-        return None, None
-
-def hubungkan_wifi():
-    ssid, password = ambil_kredensial_wifi()
-    if not ssid:
-        return False
-        
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    if not wlan.isconnected():
-        print(f"Menghubungkan ke Wi-Fi: {ssid}...")
-        wlan.connect(ssid, password)
-        timeout = 0
-        while not wlan.isconnected() and timeout < 30:
-            time.sleep(0.5)
-            timeout += 1
-            
-    if wlan.isconnected():
-        print("Wi-Fi Terhubung! IP:", wlan.ifconfig())
-        return True
-    else:
-        print("Gagal terhubung ke Wi-Fi. Periksa SSID/Password di wifi_config.txt")
-        return False
-
-def ambil_versi_lokal():
-    try:
-        with open("version.txt", "r") as f:
-            return f.read().strip()
-    except OSError:
-        return "0.0.0"
-
-def hapus_file_jika_ada(path_file):
-    try:
-        os.remove(path_file)
-    except OSError:
-        pass
-
-def lakukan_ota():
-    versi_lokal = ambil_versi_lokal()
-    print(f"Versi Lokal ESP32: {versi_lokal}")
-    print("Memeriksa pembaruan di GitHub...")
-    
-    try:
-        respon = urequests.get(URL_BASE + "version.txt")
-        versi_terbaru = respon.text.strip()
-        respon.close()
-        
-        print(f"Versi di GitHub: {versi_terbaru}")
-        
-        if versi_terbaru != versi_lokal:
-            print("Versi baru ditemukan! Memulai proses unduhan...")
-            
-            # Download file proyek ke format sementara (.tmp)
-            for file in DAFTAR_FILE:
-                url_download = URL_BASE + file
-                file_tmp = file + ".tmp"
-                
-                print(f"Mengunduh {file}...")
-                res_file = urequests.get(url_download)
-                konten = res_file.text
-                res_file.close()
-                
-                with open(file_tmp, "w") as f:
-                    f.write(konten)
-            
-            # Jika sukses semua, timpa file asli
-            print("Menerapkan pembaruan...")
-            for file in DAFTAR_FILE:
-                file_tmp = file + ".tmp"
-                hapus_file_jika_ada(file)
-                os.rename(file_tmp, file)
-                
-            print("Update sukses total! Sistem merestart...")
-            time.sleep(1)
-            machine.reset()
-        else:
-            print("Sistem sudah menggunakan versi terbaru.")
-            
-    except Exception as e:
-        print("Proses OTA Gagal:", e)
-        for file in DAFTAR_FILE:
-            hapus_file_jika_ada(file + ".tmp")
-
-# ==========================================
-# ALUR JALANNYA PROGRAM
-# ==========================================
-if hubungkan_wifi():
-    lakukan_ota()
-# --- PEMBERSIHAN MEMORI PASCA OTA ---
-print("Membersihkan memori RAM...")
+# 2. Bersihkan RAM dari sisa proses unduhan HTTP/WiFi
 gc.collect()
 
-# --- PROGRAM UTAMA ANDA DI SINI ---
-print("Menjalankan aplikasi utama...")
-led1 = machine.Pin(4, machine.Pin.OUT)
-led2 = machine.Pin(16, machine.Pin.OUT)
-led3 = machine.Pin(17, machine.Pin.OUT)
-while True:
-    led1.value(not led1.value())
-    time.sleep(1)
-    led2.value(not led2.value())
-    time.sleep(1)
-    led3.value(not led3.value())
-    time.sleep(1)
+# 3. Jalankan aplikasi utama dari library traffic
+traffic.jalankan_loop()
+
