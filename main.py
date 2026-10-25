@@ -114,6 +114,9 @@ def lakukan_ota():
 # ==========================================
 if hubungkan_wifi():
     lakukan_ota()
+# --- PEMBERSIHAN MEMORI PASCA OTA ---
+print("Membersihkan memori RAM...")
+gc.collect()
 
 # --- PROGRAM UTAMA ANDA DI SINI ---
 print("Menjalankan aplikasi utama...")
