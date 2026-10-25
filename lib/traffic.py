@@ -11,10 +11,10 @@ def jalankan_loop():
     while True:
         # Merah
         merah.value(1); kuning.value(0); hijau.value(0)
-        time.sleep(3)
+        time.sleep(1)
         # Hijau
         merah.value(0); kuning.value(0); hijau.value(1)
-        time.sleep(3)
+        time.sleep(1)
         # Kuning
         merah.value(0); kuning.value(1); hijau.value(0)
         time.sleep(1)
