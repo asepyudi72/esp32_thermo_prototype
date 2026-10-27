@@ -4,7 +4,8 @@ import os
 import machine
 import time
 
-URL_BASE = "https://githubusercontent.com"
+#URL_BASE = "https://githubusercontent.com"
+URL_BASE ="https://github.com/asepyudi72/esp32_thermo_prototype/blob/main/"
 
 DAFTAR_FILE = [
     "main.py",
